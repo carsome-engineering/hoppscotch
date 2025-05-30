@@ -5,7 +5,7 @@ global:
 
 # Community-specific settings
 community:
-  replicas: 3 # Example: 3
+  replicas: 1 # Example: 3
   image:
     repository: hoppscotch/hoppscotch
     tag: latest # Example: "v1.0.0"
