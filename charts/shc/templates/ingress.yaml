@@ -6,12 +6,12 @@ metadata:
   name: {{ .Values.service.name }}
   namespace: {{ .Values.global.namespace | default .Release.Namespace }}
   annotations:
-    {{- toYaml .Values.service.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.service.annotations | nindent 4 }}
     {{- if .Values.service.tls.enabled }}
     tls/enabled: "true"
     {{- end }}
 spec:
-  ingressClassName: {{ .Values.service.ingress.className | default "nginx" }}
+  # ingressClassName: {{ .Values.service.ingress.className | default "nginx" }}
   
   {{- if .Values.service.tls.enabled }}
   tls:

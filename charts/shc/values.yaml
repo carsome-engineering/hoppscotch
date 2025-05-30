@@ -1,7 +1,7 @@
 # Global settings for the application
 global:
-  externalIP: "0.0.0.0" # Example: "192.168.1.1"
-  namespace: "default" # Example: "hoppscotch"
+  externalIP: "" # Example: "192.168.1.1"
+  namespace: "hoppscotch" # Example: "hoppscotch"
 
 # Community-specific settings
 community:
@@ -31,7 +31,7 @@ community:
         storageClass: ""
       database: hoppscotchCommunity
       username: hoppscotch
-      password: hoppscotch123
+      password: hoppscotch12
 
     mailer:
       enable: false
@@ -63,18 +63,18 @@ community:
       dataEncryptionKey: "data encryption key with 32 char"
 
     urls:
-      base: "http://frontend.example.com"
-      shortcode: "http://frontend.example.com"
-      admin: "http://admin.example.com"
+      base: "https://hoppscotch.icarasia.com"
+      shortcode: "https://hoppscotch.icarasia.com"
+      admin: "https://admin.hoppscotch.icarasia.com"
       backend:
-        gql: "http://backend.example.com/graphql"
-        ws: "ws://backend.example.com/graphql"
-        api: "http://backend.example.com/v1"
-      redirect: "http://frontend.example.com"
-      whitelistedOrigins: "http://backend.example.com,http://frontend.example.com,http://admin.example.com"
+        gql: "https://api.hoppscotch.icarasia.com/graphql"
+        ws: "wss://api.hoppscotch.icarasia.com/graphql" # Changed to wss
+        api: "https://api.hoppscotch.icarasia.com/v1"
+      redirect: "https://hoppscotch.icarasia.com"
+      whitelistedOrigins: "https://api.hoppscotch.icarasia.com,https://hoppscotch.icarasia.com,https://admin.hoppscotch.icarasia.com"
 
     auth:
-      allowedProviders: "EMAIL" # "GOOGLE,MICROSOFT,GITHUB,EMAIL"
+      allowedProviders: "GOOGLE,EMAIL" # "GOOGLE,MICROSOFT,GITHUB,EMAIL"
 
       existingSecret: ""
       google:
@@ -100,13 +100,13 @@ community:
       enableSubpathBasedAccess: false
 
     links:
-      tos: "https://docs.example.com/terms"
-      privacyPolicy: "https://docs.example.com/privacy"
+      tos: "http://docs.example.com/terms"
+      privacyPolicy: "http://docs.example.com/privacy"
 
 # ServiceAccount configuration
 serviceAccount:
   # Name of the ServiceAccount; if not set, defaults to "{{ .Release.Name }}-sa"
-  name: ""
+  name: "hoppscotch-community-sa"
   # Annotations for the ServiceAccount (e.g., for AWS IRSA)
   annotations: {}
   # Example for AWS IRSA:
@@ -120,7 +120,7 @@ service:
   # Dynamically set based on ingress
   type: "{{ .Values.service.ingress.enabled | ternary \"ClusterIP\" \"LoadBalancer\" }}"
   # Only set externalTrafficPolicy for LoadBalancer
-  externalTrafficPolicy: "{{ .Values.service.ingress.enabled | ternary \"\" \"Cluster\" }}"
+  # externalTrafficPolicy: "{{ .Values.service.ingress.enabled | ternary \"\" \"Cluster\" }}"
 
   ports:
     backend:
@@ -149,15 +149,23 @@ service:
   # Ingress Configuration
   ingress:
     enabled: true
-    mainHost: frontend.example.com
-    adminHost: admin.example.com
-    backendHost: backend.example.com
-    className: nginx # nginx, alb, traefik
+    mainHost: hoppscotch.icarasia.com
+    adminHost: admin.hoppscotch.icarasia.com
+    backendHost: api.hoppscotch.icarasia.com
+    className: "nginx" # nginx, alb, traefik
 
   annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    service.kubernetes.io/load-balancer-type: "External"
+    kubernetes.io/ingress.global-static-ip-name: "hoppscotch-static-ip"
+    ingress.kubernetes.io/ssl-cert: hoppscotch-ssl # Static name for the TLS secret
+    ingress.gcp.kubernetes.io/pre-shared-cert: hoppscotch-ssl
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    # kubernetes.io/ingress.class: "nginx"
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod" # Replace with your ClusterIssuer name
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true" # Changed to true to enforce HTTPS
+    # nginx.ingress.kubernetes.io/auth-type: "basic"
+    # nginx.ingress.kubernetes.io/auth-secret: "hoppscotch-basic-auth" # Name of the secret created in Step 1
+    # nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - Hoppscotch"
+    # service.kubernetes.io/load-balancer-type: "External" # This is for Service type LoadBalancer, not Ingress
     # Example AWS ALB internal configuration
     # alb.ingress.kubernetes.io/scheme: "internal"
     # alb.ingress.kubernetes.io/security-groups: "sg-12345678"
@@ -165,5 +173,5 @@ service:
 
   # TLS Configuration
   tls:
-    enabled: false
-    secretName: hoppscotch-tls
+    enabled: "false" # You can keep this true if you want cert-manager to provision a cert
+    # secretName: hoppscotch-tls # Static name for the TLS secret

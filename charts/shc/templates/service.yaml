@@ -9,7 +9,7 @@ metadata:
   annotations:
     {{- toYaml .Values.service.annotations | nindent 4 }}
 spec:
-  type: {{ ternary "ClusterIP" "LoadBalancer" .Values.service.ingress.enabled }}
+  type: {{ ternary "NodePort" "LoadBalancer" .Values.service.ingress.enabled }}
   
   {{- if not .Values.service.ingress.enabled }}
   loadBalancerIP: {{ .Values.global.externalIP }}

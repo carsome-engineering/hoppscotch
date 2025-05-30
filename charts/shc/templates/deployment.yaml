@@ -76,6 +76,26 @@ spec:
                 name: {{ .Release.Name }}-community-secrets
           resources:
             {{- toYaml .Values.community.resources | nindent 12 }}
+          {{- if not .Values.community.config.community.enableSubpathBasedAccess }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.ports.backend.name }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.ports.backend.name }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          {{- end }}
       {{- if .Values.community.config.affinityEnabled }}
       affinity: 
         nodeAffinity:
