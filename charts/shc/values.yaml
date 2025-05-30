@@ -13,7 +13,7 @@ community:
   resources:
     limits:
       cpu: 500m
-      memory: 512Mi
+      memory: 2Gi
     requests:
       cpu: 250m
       memory: 256Mi
